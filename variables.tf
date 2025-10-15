@@ -37,10 +37,10 @@ variable "iso_storage" {
 
 variable "windows_iso" {
   type    = string
-  default = "Windows_Server_2025.iso"
+  default = "SERVER_EVAL_x64FRE_en-us.iso"
 }
 
 variable "virtio_iso" {
   type    = string
-  default = "virtio-win.iso"
+  default = "virtio-win-0.1.285.iso"
 }

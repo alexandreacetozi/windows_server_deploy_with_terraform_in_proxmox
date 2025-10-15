@@ -3,9 +3,8 @@ terraform {
 
   required_providers {
     proxmox = {
-      source = "Telmate/proxmox"
-      # If you want a pinned version:
-      # version = "~> 3.0"
+      source  = "bpg/proxmox"
+      version = "~> 0.50"
     }
   }
 }

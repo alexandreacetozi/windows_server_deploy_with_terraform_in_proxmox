@@ -1,52 +1,45 @@
-resource "proxmox_vm_qemu" "win2025" {
-  name        = var.vm_name
-  vmid        = var.vm_id
-  target_node = var.target_node
+resource "proxmox_virtual_environment_vm" "win2025" {
+  name      = var.vm_name
+  vm_id     = var.vm_id
+  node_name = var.target_node
+  started   = true
 
-  # UEFI (OVMF). Secure Boot/TPM can be added depending on provider support.
-  bios = "ovmf"
-  # Create an EFI disk on your storage. The exact syntax varies by provider version:
-  # Most Telmate builds accept this shorthand:
-  efidisk0 = "${var.storage}:1,pre-enrolled-keys=1"
+  # Firmware / boot
+  bios       = "ovmf"
+  boot_order = ["ide0", "sata0"] # boot installer, then disk
 
-  # CPU & RAM
-  sockets = 1
-  cores   = 4
-  memory  = 8192
+  # Create an EFI vars disk with Microsoft keys (Secure Boot ready)
+  efi_disk {
+    datastore_id      = var.storage
+    pre_enrolled_keys = true
+  }
 
-  # VirtIO SCSI controller
-  scsihw = "virtio-scsi-single"
+  cpu {
+    sockets = 1
+    cores   = 4
+  }
 
-  # Boot order: cdrom (Windows ISO), then scsi0
-  boot   = "order=ide2;scsi0"
-  onboot = true
+  memory {
+    dedicated = 8192
+  }
 
-  # Attach Windows Server 2025 ISO
-  ide2 = "${var.iso_storage}:iso/${var.windows_iso},media=cdrom"
+  # Attach Windows ISO as CD-ROM (installer)
+  cdrom {
+    interface = "ide0"
+    # file_id format: "<storage>:iso/<file>"
+    file_id = "${var.iso_storage}:iso/${var.windows_iso}"
+  }
 
-  # Attach VirtIO drivers ISO on a second CD-ROM (IDE0 works well)
-  ide0 = "${var.iso_storage}:iso/${var.virtio_iso},media=cdrom"
-
-  # System disk on SCSI (virtio)
+  # System disk on SATA (no driver needed)
   disk {
-    slot     = 0
-    type     = "scsi"
-    size     = "80G"
-    storage  = var.storage
-    iothread = 1
-    ssd      = 1
-    discard  = "on"        # TRIM
-    cache    = "writeback" # performance (safer default is "none")
+    interface    = "sata0"
+    datastore_id = var.storage
+    size         = 80
   }
 
-  # Paravirtualized network (VirtIO)
-  network {
-    model  = "virtio"
+  # NIC E1000 (works without drivers)
+  network_device {
+    model  = "e1000"
     bridge = "vmbr0"
-    # tag = 10  # optionally set a VLAN
   }
-
-  # Recommended display; qemu-guest-agent can be enabled after drivers installed
-  # agent = 1
-  # vga   = "qxl"
 }
