@@ -1,14 +1,14 @@
 resource "proxmox_virtual_environment_vm" "win2025" {
-  name      = var.vm_name
-  vm_id     = var.vm_id
-  node_name = var.target_node
+  for_each = var.vms
+
+  name      = each.value.name
+  vm_id     = each.value.vm_id
+  node_name = each.value.node_name
   started   = true
 
-  # Firmware / boot
   bios       = "ovmf"
-  boot_order = ["ide0", "sata0"] # boot installer, then disk
+  boot_order = ["ide0", "sata0"]
 
-  # Create an EFI vars disk with Microsoft keys (Secure Boot ready)
   efi_disk {
     datastore_id      = var.storage
     pre_enrolled_keys = true
@@ -16,28 +16,24 @@ resource "proxmox_virtual_environment_vm" "win2025" {
 
   cpu {
     sockets = 1
-    cores   = 4
+    cores   = each.value.cores
   }
 
   memory {
-    dedicated = 8192
+    dedicated = each.value.memory_mb
   }
 
-  # Attach Windows ISO as CD-ROM (installer)
   cdrom {
     interface = "ide0"
-    # file_id format: "<storage>:iso/<file>"
-    file_id = "${var.iso_storage}:iso/${var.windows_iso}"
+    file_id   = "${var.iso_storage}:iso/${var.windows_iso}"
   }
 
-  # System disk on SATA (no driver needed)
   disk {
     interface    = "sata0"
     datastore_id = var.storage
     size         = 80
   }
 
-  # NIC E1000 (works without drivers)
   network_device {
     model  = "e1000"
     bridge = "vmbr0"

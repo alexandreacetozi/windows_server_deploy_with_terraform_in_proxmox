@@ -1,3 +1,14 @@
+variable "vms" {
+  description = "Per-VM config map"
+  type = map(object({
+    vm_id     = number
+    node_name = string
+    name      = string
+    cores     = number
+    memory_mb = number
+  }))
+}
+
 variable "pm_api_url" {
   type = string
 }
@@ -8,21 +19,6 @@ variable "pm_api_token_id" {
 
 variable "pm_api_token_secret" {
   type = string
-}
-
-variable "target_node" {
-  type    = string
-  default = "pve"
-}
-
-variable "vm_id" {
-  type    = number
-  default = 120
-}
-
-variable "vm_name" {
-  type    = string
-  default = "win2025"
 }
 
 variable "storage" {
