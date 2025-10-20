@@ -1,5 +1,4 @@
 # USAGE: Set-ServerHostname -NewName 'DC01' -Restart
-
 function Set-ServerHostname {
 <#
 .SYNOPSIS
