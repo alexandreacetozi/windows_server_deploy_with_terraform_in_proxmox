@@ -9,6 +9,18 @@ resource "proxmox_virtual_environment_vm" "win2025" {
   bios       = "ovmf"
   boot_order = ["ide0", "sata0"]
 
+  # --- Keep OS hint ---
+  operating_system {
+    type = "win11"
+  }
+
+  # --- Keep QEMU Guest Agent ---
+  agent {
+    enabled = true
+    type    = "virtio" # provider default is fine; keep if you used it
+    timeout = "15m"
+  }
+
   efi_disk {
     datastore_id      = var.storage
     pre_enrolled_keys = true

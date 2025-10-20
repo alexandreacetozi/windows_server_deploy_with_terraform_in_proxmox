@@ -9,5 +9,5 @@ virtio_iso          = "virtio-win-0.1.285.iso"
 vms = {
   "a" = { vm_id = 14001, node_name = "pve", name = "win2025-01", cores = 4, memory_mb = 8192 }
   "b" = { vm_id = 14002, node_name = "pve", name = "win2025-02", cores = 4, memory_mb = 4096 }
-  #  "c" = { vm_id = 14003, node_name = "pve", name = "win2025-03", cores = 4, memory_mb = 4096 }
+  "c" = { vm_id = 14003, node_name = "pve", name = "win2025-03", cores = 4, memory_mb = 4096 }
 }
